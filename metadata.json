@@ -1,0 +1,5 @@
+{
+  "name": "Bridge",
+  "description": "An information filtering and cognitive bridging tool designed to reduce polarization and information overload by providing AI-synthesized summaries, viewpoint analysis, and situational mapping.",
+  "requestFramePermissions": []
+}
