@@ -307,7 +307,7 @@ function App() {
              <AudioFeed topics={topics} />
 
              {/* Search Bar */}
-             <form onSubmit={handleSearch} className="flex-1 relative mt-1">
+             <form onSubmit={handleSearch} className="flex-1 relative mt-4">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                  {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
                 </div>
@@ -550,7 +550,7 @@ function App() {
                       <div className="w-full h-px bg-slate-100 sm:hidden"></div>
 
                       {/* Right Column: Lens (30%) - Optimized Layout */}
-                      <div className="w-full sm:w-[30%] flex flex-col justify-between items-end gap-3 pl-0 sm:pl-5 sm:border-l border-slate-100 relative min-h-[140px]">
+                      <div className="w-full sm:w-[30%] flex flex-col justify-between items-end gap-3 pl-0 sm:pl-5 pr-0 sm:border-l border-slate-100 relative min-h-[140px]">
                          
                          {/* Row 1: Favorite Icon */}
                          <button
@@ -558,14 +558,14 @@ function App() {
                               e.stopPropagation();
                               handleToggleFavorite(topic);
                             }}
-                            className="absolute top-0 right-0 text-slate-300 hover:text-amber-400 hover:bg-amber-50 rounded-full transition-colors p-1 z-10"
+                            className="absolute top-10 right-[15px] text-slate-300 hover:text-amber-400 hover:bg-amber-50 rounded-full transition-colors p-1 z-10"
                             title={isFav ? "Remove from Favorites" : "Add to Favorites"}
                           >
                             <Star size={20} className={isFav ? "fill-amber-400 text-amber-400" : ""} />
                           </button>
 
                          {/* Row 2: Lens SVG - Centered Vertically in upper space */}
-                         <div className="flex-1 flex items-center justify-end w-full py-2">
+                         <div className="flex-1 flex items-center justify-end w-full py-2 pr-[70px]">
                             <LensIcon 
                               scope={topic.lensMetrics?.scope || 50} 
                               diversity={topic.lensMetrics?.diversity || 50} 
