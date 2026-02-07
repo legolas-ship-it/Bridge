@@ -86,9 +86,9 @@ export const TRANSLATIONS = {
     // Topic Detail
     backToDigest: "Back to Digest",
     aiGenerated: "✨ AI Generated Analysis",
-    tabSummary: "Summary & Facts",
-    tabViewpoint: "Viewpoint Analysis",
-    tabExtended: "Extended Reading",
+    tabSummary: "Facts",
+    tabViewpoint: "The Map",
+    tabExtended: "Expand",
     whyMatters: "Why it matters",
     objectiveFacts: "Objective Facts",
     confidence: "Confidence",
