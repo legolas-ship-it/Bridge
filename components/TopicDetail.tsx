@@ -108,6 +108,7 @@ const TopicDetail: React.FC<TopicDetailProps> = ({ topic, onBack, isFavorite, on
       {/* Tabs Header */}
       <div className="sticky top-[64px] z-30 bg-[#f8fafc]/90 backdrop-blur-md border-b border-slate-200 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 transition-all">
         <div className="flex gap-1 sm:gap-6 overflow-x-auto no-scrollbar">
+          {/* Tab 0: The Map */}
           <button
             onClick={() => setActiveTab(0)}
             className={`relative py-3 px-4 text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
@@ -116,10 +117,12 @@ const TopicDetail: React.FC<TopicDetailProps> = ({ topic, onBack, isFavorite, on
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 rounded-t-lg'
             }`}
           >
-            <AlertCircle size={16} />
-            {t('tabSummary')}
+            <BarChart2 size={16} />
+            {t('tabViewpoint')}
             {activeTab === 0 && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
           </button>
+          
+          {/* Tab 1: Facts */}
           <button
             onClick={() => setActiveTab(1)}
             className={`relative py-3 px-4 text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
@@ -128,10 +131,12 @@ const TopicDetail: React.FC<TopicDetailProps> = ({ topic, onBack, isFavorite, on
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 rounded-t-lg'
             }`}
           >
-            <BarChart2 size={16} />
-            {t('tabViewpoint')}
+             <AlertCircle size={16} />
+            {t('tabSummary')}
             {activeTab === 1 && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
           </button>
+          
+          {/* Tab 2: Expand */}
           <button
             onClick={() => setActiveTab(2)}
             className={`relative py-3 px-4 text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
@@ -149,7 +154,98 @@ const TopicDetail: React.FC<TopicDetailProps> = ({ topic, onBack, isFavorite, on
 
       {/* Tab Content */}
       <div className="min-h-[500px]">
+        {/* Active Tab 0: The Map (Was formerly Tab 1) */}
         {activeTab === 0 && (
+          <div className="flex flex-col gap-4 animate-in slide-in-from-bottom-2 fade-in duration-300 pb-10">
+            {(!topic.stakeholders || !topic.divergenceRating) ? (
+              <LoadingPlaceholder text={t('loadingMapping')} subtext={t('loadingReading')} />
+            ) : (
+              <>
+                {/* TOP ROW: Compact Indicators (Grid of 3) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+                    
+                    {/* 1. Core Conflict */}
+                    <div className={`${cardContainerStyle} flex flex-col relative overflow-hidden group hover:border-rose-200 transition-colors`}>
+                        <div className="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+                        <h3 className={cardHeaderStyle}>
+                           <AlertCircle size={16} className="text-rose-500" /> 
+                           {t('coreConflict')}
+                        </h3>
+                        <p className="text-slate-800 text-sm leading-snug font-serif font-medium flex-1 flex items-center">
+                            "{topic.perspectiveSummary}"
+                        </p>
+                    </div>
+
+                    {/* 2. Trend Analysis */}
+                    <div className={`${cardContainerStyle} flex flex-col`}>
+                        <h3 className={cardHeaderStyle}>
+                            <TrendingUp size={16} className="text-blue-500" />
+                            {t('opinionTrend')}
+                        </h3>
+                        {topic.trendAnalysis && (
+                          <div className="flex-1 w-full min-h-[60px]">
+                              <ResponsiveContainer width="100%" height="100%">
+                              <LineChart data={topic.trendAnalysis}>
+                                  <Line type="monotone" dataKey="sentiment" stroke="#3b82f6" strokeWidth={2} dot={{r: 2}} />
+                              </LineChart>
+                              </ResponsiveContainer>
+                          </div>
+                        )}
+                         <div className="flex justify-between items-end mt-1">
+                            <span className="text-[10px] text-slate-400">30 Days</span>
+                            <span className="text-xs font-bold text-blue-600">
+                               {topic.trendAnalysis?.[topic.trendAnalysis.length-1].sentiment}% Positive
+                            </span>
+                         </div>
+                    </div>
+
+                    {/* 3. Missing Intel */}
+                    <div className={`${cardContainerStyle} flex flex-col`}>
+                        <h3 className={cardHeaderStyle}>
+                             <HelpCircle size={16} className="text-amber-500" />
+                             {t('missingKeyInfo')}
+                        </h3>
+                        <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1 max-h-[100px] md:max-h-none">
+                            {topic.missingIntel?.map((item, i) => (
+                                <div key={i} className="flex flex-col gap-0.5 border-b border-slate-100 last:border-0 pb-2 last:pb-0">
+                                    <p className="font-bold text-slate-800 text-xs leading-tight">{item.question}</p>
+                                    <div className="flex items-center gap-1 text-[9px] text-slate-400 font-bold uppercase">
+                                        <span>Source:</span>
+                                        <span className="text-amber-600 bg-amber-50 px-1 rounded">{item.trustedSource}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* BOTTOM ROW: Map & Sim (Grid of 12) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-auto lg:h-[500px]">
+                    
+                    {/* Situation Map (8 Cols) */}
+                    <div className="lg:col-span-8 h-[500px] lg:h-full">
+                        <SituationMap stakeholders={topic.stakeholders} language={language} />
+                    </div>
+
+                    {/* Role Play (4 Cols) */}
+                    <div className="lg:col-span-4 h-auto lg:h-full">
+                         {/* Pass full topic to allow chat context */}
+                         <RolePlayGame 
+                           data={topic.rolePlay} 
+                           topic={topic} 
+                           language={language} 
+                           userProfile={userProfile}
+                           onUpgradeClick={onUpgradeClick}
+                         />
+                    </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Active Tab 1: Facts (Was formerly Tab 0) */}
+        {activeTab === 1 && (
           <div className="grid md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-2 fade-in duration-300">
             
             {/* Left Column: Narrative (2/3 width) */}
@@ -245,95 +341,6 @@ const TopicDetail: React.FC<TopicDetailProps> = ({ topic, onBack, isFavorite, on
                </div>
 
             </div>
-          </div>
-        )}
-
-        {activeTab === 1 && (
-          <div className="flex flex-col gap-4 animate-in slide-in-from-bottom-2 fade-in duration-300 pb-10">
-            {(!topic.stakeholders || !topic.divergenceRating) ? (
-              <LoadingPlaceholder text={t('loadingMapping')} subtext={t('loadingReading')} />
-            ) : (
-              <>
-                {/* TOP ROW: Compact Indicators (Grid of 3) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-                    
-                    {/* 1. Core Conflict */}
-                    <div className={`${cardContainerStyle} flex flex-col relative overflow-hidden group hover:border-rose-200 transition-colors`}>
-                        <div className="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                        <h3 className={cardHeaderStyle}>
-                           <AlertCircle size={16} className="text-rose-500" /> 
-                           {t('coreConflict')}
-                        </h3>
-                        <p className="text-slate-800 text-sm leading-snug font-serif font-medium flex-1 flex items-center">
-                            "{topic.perspectiveSummary}"
-                        </p>
-                    </div>
-
-                    {/* 2. Trend Analysis */}
-                    <div className={`${cardContainerStyle} flex flex-col`}>
-                        <h3 className={cardHeaderStyle}>
-                            <TrendingUp size={16} className="text-blue-500" />
-                            {t('opinionTrend')}
-                        </h3>
-                        {topic.trendAnalysis && (
-                          <div className="flex-1 w-full min-h-[60px]">
-                              <ResponsiveContainer width="100%" height="100%">
-                              <LineChart data={topic.trendAnalysis}>
-                                  <Line type="monotone" dataKey="sentiment" stroke="#3b82f6" strokeWidth={2} dot={{r: 2}} />
-                              </LineChart>
-                              </ResponsiveContainer>
-                          </div>
-                        )}
-                         <div className="flex justify-between items-end mt-1">
-                            <span className="text-[10px] text-slate-400">30 Days</span>
-                            <span className="text-xs font-bold text-blue-600">
-                               {topic.trendAnalysis?.[topic.trendAnalysis.length-1].sentiment}% Positive
-                            </span>
-                         </div>
-                    </div>
-
-                    {/* 3. Missing Intel */}
-                    <div className={`${cardContainerStyle} flex flex-col`}>
-                        <h3 className={cardHeaderStyle}>
-                             <HelpCircle size={16} className="text-amber-500" />
-                             {t('missingKeyInfo')}
-                        </h3>
-                        <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1 max-h-[100px] md:max-h-none">
-                            {topic.missingIntel?.map((item, i) => (
-                                <div key={i} className="flex flex-col gap-0.5 border-b border-slate-100 last:border-0 pb-2 last:pb-0">
-                                    <p className="font-bold text-slate-800 text-xs leading-tight">{item.question}</p>
-                                    <div className="flex items-center gap-1 text-[9px] text-slate-400 font-bold uppercase">
-                                        <span>Source:</span>
-                                        <span className="text-amber-600 bg-amber-50 px-1 rounded">{item.trustedSource}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* BOTTOM ROW: Map & Sim (Grid of 12) */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-auto lg:h-[500px]">
-                    
-                    {/* Situation Map (8 Cols) */}
-                    <div className="lg:col-span-8 h-[500px] lg:h-full">
-                        <SituationMap stakeholders={topic.stakeholders} language={language} />
-                    </div>
-
-                    {/* Role Play (4 Cols) */}
-                    <div className="lg:col-span-4 h-auto lg:h-full">
-                         {/* Pass full topic to allow chat context */}
-                         <RolePlayGame 
-                           data={topic.rolePlay} 
-                           topic={topic} 
-                           language={language} 
-                           userProfile={userProfile}
-                           onUpgradeClick={onUpgradeClick}
-                         />
-                    </div>
-                </div>
-              </>
-            )}
           </div>
         )}
 
